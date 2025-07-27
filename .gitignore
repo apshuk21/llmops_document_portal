@@ -1,3 +1,9 @@
-venv
+venv/
 .env
 .DS_Store
+document_portal.egg-info
+logs/
+__pycache__/
+*.pyc
+data/
+test.py

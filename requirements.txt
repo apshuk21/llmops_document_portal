@@ -5,4 +5,6 @@ langchain-community
 python-dotenv
 pypdf
 faiss-cpu
+structlog
+PyMuPDF
 -e .
