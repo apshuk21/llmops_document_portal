@@ -158,11 +158,18 @@ if __name__ == '__main__':
     # Test the loading of embedding model
     embeddings = loader.load_embeddings()
     print(f"Embedding model loaded: {embeddings}")
+    print("**************"*4)
+
+    vectors = embeddings.embed_query("Do you know about IPL?")
+    print(f"Vectors: {vectors}")
+    print("**************"*4)
 
     # Test the loading of LLM model
     llm = loader.load_llm()
     print(f"LLM loaded: {llm}")
+    print("**************"*4)
 
     # Test the ModelLoader
     result = llm.invoke("Do you know about IPL?")
     print(f"LLM result: {result}")
+    print("**************"*4)
