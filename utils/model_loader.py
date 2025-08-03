@@ -73,19 +73,6 @@ logger = CustomLogger().get_logger(name=__name__)
 
 #         return llm
 
-import os
-import sys
-from dotenv import load_dotenv
-from utils.config_loader import load_config
-from logger.custom_logger import CustomLogger
-from exception.custom_exception import DocumentPortalException
-
-from langchain_openai import OpenAIEmbeddings
-from langchain.chat_models import init_chat_model
-
-logger = CustomLogger().get_logger(name=__name__)
-
-
 class ModelLoader:
     """
     A utility class to load embedding models and LLM models
@@ -147,7 +134,7 @@ class ModelLoader:
             f"Temperature: {temperature}, Max Tokens: {max_tokens}"
         )
 
-        llm = init_chat_model(model=model_name, model_provider=provider)
+        llm = init_chat_model(model_name, model_provider=provider, temperature=temperature, max_tokens=max_tokens)
 
         return llm
 

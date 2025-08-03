@@ -11,6 +11,8 @@ class DocumentHandler:
     Automatically logs all actions and supports session-based organization.
     """
 
+    ## This constructor function is all about creating session directory for the data.
+    ## This session directory is to achieve the data versioning.
     def __init__(self, data_dir=None, session_id=None):
         try:
             self.logger = CustomLogger().get_logger(__name__)
