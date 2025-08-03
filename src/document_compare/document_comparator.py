@@ -1,5 +1,5 @@
 import sys
-import pandas
+import pandas as pd
 from dotenv import load_dotenv
 from logger.custom_logger import CustomLogger
 from utils.model_loader import ModelLoader
@@ -22,22 +22,31 @@ class DocumentComparatorLLM:
         self.chain = self.prompt | self.llm | self.fixing_parser
 
 
-    def compare_documents(self):
+    def compare_documents(self, combined_docs: str) -> pd.DataFrame:
         """
         Compares two documents and returns a structured response
         """
         try:
-            pass
+            inputs = {
+                "combined_docs": combined_docs,
+                "format_instruction": self.parser.get_format_instructions()
+            }
+
+            self.logger.info("Invoking document comparison LLM chain")
+            response = self.chain.invoke(inputs)
+            self.logger.info("Chain invoked successfully", response_preview=str(response)[:200])
+            return self._format_response(response)
         except Exception as e:
             self.logger.error(f"Error in compare documents: {e}")
             raise DocumentPortalException("An error occured while comparing documents.", sys)
 
-    def _format_response(self):
+    def _format_response(self, response_parsed: list[dict]) -> pd.DataFrame:
         """
         Formats the response from the LLM into a structured format
         """
         try:
-            pass
+            df = pd.DataFrame(response_parsed)
+            return df
         except Exception as e:
             self.logger.error(f"Error formatting response into DataFrame: {e}")
             raise DocumentPortalException("Error formatting response.", sys)
