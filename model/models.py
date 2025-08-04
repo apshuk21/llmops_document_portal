@@ -1,8 +1,12 @@
 from pydantic import BaseModel, Field, RootModel
 from typing import List, Union
+from enum import Enum
+
 
 class MetaData(BaseModel):
-    Summary: List[str] = Field(default_factory=list, description="Summary of the document")
+    Summary: List[str] = Field(
+        default_factory=list, description="Summary of the document"
+    )
     Title: str
     Author: str
     DateCreated: str
@@ -12,15 +16,18 @@ class MetaData(BaseModel):
     PageCount: Union[int, str]  # Can be "Not Available"
     SentimentTone: str
 
+
 class ChangeFormat(BaseModel):
     Page: str
     Changes: str
 
+
 class SummaryResponse(RootModel[list[ChangeFormat]]):
     pass
 
-# class PromptType(str, Enum):
-#     DOCUMENT_ANALYSIS = "document_analysis"
-#     DOCUMENT_COMPARISON = "document_comparison"
-#     CONTEXTUALIZE_QUESTION = "contextualize_question"
-#     CONTEXT_QA = "context_qa"
+
+class PromptType(str, Enum):
+    DOCUMENT_ANALYSIS = "document_analysis"
+    DOCUMENT_COMPARISON = "document_comparison"
+    CONTEXTUALIZE_QUESTION = "contextualize_question"
+    CONTEXT_QA = "context_qa"
