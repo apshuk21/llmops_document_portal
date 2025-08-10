@@ -6,10 +6,8 @@ from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 from utils.model_loader import ModelLoader
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
-
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-# from langchain_community.vectorstores import FAISS
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
 
 
 class DocumentIngestor:
@@ -109,7 +107,35 @@ class DocumentIngestor:
 
     def _create_retriever(self, documents):
         try:
-            pass
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=300
+            )
+            chunks = splitter.split_documents(documents)
+            self.logger.info(
+                "Documents split into chunks",
+                total_chunks=len(chunks),
+                session_id=self.session_id,
+            )
+
+            embeddings = self.model_loader.load_embeddings()
+            vectorstore = FAISS.from_documents(documents=chunks, embedding=embeddings)
+
+            # Save FAISS index under session folder
+            vectorstore.save_local(str(self.session_faiss_dir))
+            self.logger.info(
+                "FAISS index saved to disk",
+                path=str(self.session_faiss_dir),
+                session_id=self.session_id,
+            )
+
+            retriever = vectorstore.as_retriever(
+                search_type="similarity", search_kwargs={"k": 5}
+            )
+
+            self.logger.info(
+                "FAISS retriever created and ready to use", session_id=self.session_id
+            )
+            return retriever
         except Exception as e:
             self.logger.error("Failed to ingest files", error=str(e))
             raise DocumentPortalException("Ingestion error in DocumentIngestor", sys)
