@@ -2,6 +2,7 @@ ipykernel
 langchain
 langchain-openai
 langchain-community
+langchain-core[tracing]
 python-dotenv
 pypdf
 faiss-cpu
@@ -10,4 +11,6 @@ PyMuPDF
 pyyaml
 pandas
 numpy
+pytest
+streamlit
 -e .

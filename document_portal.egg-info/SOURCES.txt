@@ -1,4 +1,5 @@
 README.md
+setup.cfg
 setup.py
 document_portal.egg-info/PKG-INFO
 document_portal.egg-info/SOURCES.txt
@@ -30,5 +31,6 @@ src/single_document_chat/evaluation.py
 src/single_document_chat/retrieval.py
 utils/__init__.py
 utils/config_loader.py
+utils/fake_upload.py
 utils/llm_utils.py
 utils/model_loader.py
