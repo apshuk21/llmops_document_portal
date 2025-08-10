@@ -5,6 +5,11 @@ from datetime import datetime, timezone
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 from utils.model_loader import ModelLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
+
+# from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+# from langchain_community.vectorstores import FAISS
 
 
 class DocumentIngestor:
@@ -13,7 +18,7 @@ class DocumentIngestor:
     def __init__(
         self,
         temp_dir: str = "data/multi_document_chat",
-        faiss_dir: str = "faiss_index",
+        faiss_dir: str = "multidoc_faiss_index",
         session_id: str | None = None,
     ):
         self.logger = CustomLogger().get_logger(__name__)
@@ -51,9 +56,53 @@ class DocumentIngestor:
                 "Initialization error in MultiDoc DocumentIngestor", sys
             )
 
-    def ingest_files(self):
+    def ingest_files(self, uploaded_files):
         try:
-            pass
+            documents = []
+
+            for uploaded_file in uploaded_files:
+                ext = Path(uploaded_file.name).suffix.lower()
+                if ext not in self.SUPPORTED_EXTENSIONS:
+                    self.logger.warning(
+                        "Unsupported file skipped", filename=uploaded_file.name
+                    )
+                    continue
+                unique_filename = f"{uuid.uuid4().hex[:8]}{ext}"
+                temp_path = self.session_temp_dir / unique_filename
+
+                with open(temp_path, "wb") as f:
+                    f.write(uploaded_file.read())
+                self.logger.info(
+                    "File saved for ingestion",
+                    filename=uploaded_file.name,
+                    saved_as=str(temp_path),
+                    session_id=self.session_id,
+                )
+
+                if ext == ".pdf":
+                    loader = PyPDFLoader(str(temp_path))
+                elif ext == ".docx":
+                    loader = Docx2txtLoader(str(temp_path))
+                elif ext == ".txt":
+                    loader = TextLoader(str(temp_path), encoding="utf-8")
+                else:
+                    self.logger.warning(
+                        "Unsupported file type encountered", filename=uploaded_file.name
+                    )
+                    continue
+
+                docs = loader.load()
+                documents.extend(docs)
+
+            if not documents:
+                raise DocumentPortalException("No valid documents loaded", sys)
+
+            self.logger.info(
+                "All documents loaded",
+                total_docs=len(documents),
+                session_id=self.session_id,
+            )
+            return self._create_retriever(documents)
         except Exception as e:
             self.logger.error("Failed to ingest files", error=str(e))
             raise DocumentPortalException("Ingestion error in DocumentIngestor", sys)
