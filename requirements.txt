@@ -13,4 +13,5 @@ pandas
 numpy
 pytest
 streamlit
+docx2txt
 -e .
