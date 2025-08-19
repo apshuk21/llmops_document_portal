@@ -26,7 +26,7 @@ class DocumentAnalyzer:
                 parser=self.parser, llm=self.llm
             )
 
-            self.prompt = PROMPT_REGISTRY.get("document_analysis_prompt", "")
+            self.prompt = PROMPT_REGISTRY.get("document_analysis", "")
 
             self.log.info("DocumentAnalyzer initialized successfully")
 
@@ -41,6 +41,7 @@ class DocumentAnalyzer:
         Analyze a document's text and extract structured metadata & summary.
         """
         try:
+            refined_text = document_text[:200]
             chain = self.prompt | self.llm | self.fixing_parser
 
             self.log.info("Meta-data analysis chain initialized")
@@ -48,7 +49,7 @@ class DocumentAnalyzer:
             response = chain.invoke(
                 {
                     "format_instructions": self.parser.get_format_instructions(),
-                    "document_text": document_text,
+                    "document_text": refined_text,
                 }
             )
 

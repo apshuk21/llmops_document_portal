@@ -19,7 +19,7 @@ class DocumentComparatorLLM:
         self.fixing_parser = OutputFixingParser.from_llm(
             parser=self.parser, llm=self.llm
         )
-        self.prompt = PROMPT_REGISTRY.get("document_comparison_prompt", "")
+        self.prompt = PROMPT_REGISTRY.get("document_comparison", "")
 
         self.chain = self.prompt | self.llm | self.parser
 
